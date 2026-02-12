@@ -1,0 +1,8 @@
+{
+  "name": "BrandCraft",
+  "description": "Generative AI Powered Branding Automation System for creating brand names, logos, content, and sentiment analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
