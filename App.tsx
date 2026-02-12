@@ -11,7 +11,8 @@ import {
   Sparkles,
   Menu,
   Settings as SettingsIcon,
-  X
+  Search,
+  CalendarDays
 } from 'lucide-react';
 
 import Dashboard from './components/Dashboard';
@@ -21,6 +22,8 @@ import LogoGenerator from './components/LogoGenerator';
 import ContentGenerator from './components/ContentGenerator';
 import SentimentAnalyzer from './components/SentimentAnalyzer';
 import BrandingAssistant from './components/BrandingAssistant';
+import BrandResearch from './components/BrandResearch';
+import MarketingRoadmap from './components/MarketingRoadmap';
 import { AppRoute, BrandContext } from './types';
 
 interface BrandContextType {
@@ -40,9 +43,11 @@ const Sidebar = ({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) =>
   const navItems = [
     { id: AppRoute.DASHBOARD, label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
     { id: AppRoute.CONTEXT, label: 'Brand Context', icon: <SettingsIcon size={20} />, path: '/context' },
+    { id: AppRoute.RESEARCH, label: 'Industry Intelligence', icon: <Search size={20} />, path: '/research' },
     { id: AppRoute.NAME_GEN, label: 'Name Generator', icon: <Tag size={20} />, path: '/names' },
     { id: AppRoute.LOGO_GEN, label: 'Logo Designer', icon: <Palette size={20} />, path: '/logos' },
     { id: AppRoute.CONTENT_GEN, label: 'Content Creator', icon: <FileText size={20} />, path: '/content' },
+    { id: AppRoute.ROADMAP, label: 'Brand Roadmap', icon: <CalendarDays size={20} />, path: '/roadmap' },
     { id: AppRoute.SENTIMENT, label: 'Sentiment AI', icon: <BarChart3 size={20} />, path: '/sentiment' },
     { id: AppRoute.ASSISTANT, label: 'Branding Assistant', icon: <MessageSquare size={20} />, path: '/assistant' },
   ];
@@ -86,7 +91,7 @@ const Sidebar = ({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) =>
                   `}
                 >
                   {item.icon}
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium text-sm">{item.label}</span>
                 </Link>
               );
             })}
@@ -107,14 +112,6 @@ const Sidebar = ({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) =>
                   </p>
                 </div>
               </div>
-              {!context && (
-                <Link 
-                  to="/context" 
-                  className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider text-center pt-1"
-                >
-                  Setup Context
-                </Link>
-              )}
             </div>
           </div>
         </div>
@@ -132,14 +129,10 @@ const Header = ({ toggle }: { toggle: () => void }) => {
       >
         <Menu size={24} />
       </button>
-      
-      <div className="flex-1 lg:flex-none" />
-      
-      <div className="flex items-center gap-4">
-        <div className="hidden sm:flex items-center bg-slate-800 rounded-full px-3 py-1 border border-slate-700">
-          <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse" />
-          <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">Neural Engine Live</span>
-        </div>
+      <div className="flex-1" />
+      <div className="hidden sm:flex items-center bg-slate-800 rounded-full px-3 py-1 border border-slate-700">
+        <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse" />
+        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">System Ready</span>
       </div>
     </header>
   );
@@ -172,9 +165,11 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/context" element={<BrandContextSetup />} />
+                <Route path="/research" element={<BrandResearch />} />
                 <Route path="/names" element={<BrandNameGenerator />} />
                 <Route path="/logos" element={<LogoGenerator />} />
                 <Route path="/content" element={<ContentGenerator />} />
+                <Route path="/roadmap" element={<MarketingRoadmap />} />
                 <Route path="/sentiment" element={<SentimentAnalyzer />} />
                 <Route path="/assistant" element={<BrandingAssistant />} />
                 <Route path="*" element={<Navigate to="/" />} />

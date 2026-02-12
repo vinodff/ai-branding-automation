@@ -25,6 +25,8 @@ export enum AppRoute {
   CONTENT_GEN = 'content-gen',
   SENTIMENT = 'sentiment',
   ASSISTANT = 'assistant',
+  RESEARCH = 'research',
+  ROADMAP = 'roadmap',
 }
 
 export interface NavItem {
@@ -53,4 +55,11 @@ export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: Date;
+}
+
+export interface RoadmapStep {
+  day: number;
+  task: string;
+  phase: 'Identity' | 'Visuals' | 'Launch';
+  description: string;
 }

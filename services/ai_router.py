@@ -1,29 +1,65 @@
-from typing import Any
-import random
+
+from typing import Any, Dict
+import logging
+from services.providers.gemini_provider import GeminiProvider
+from services.providers.huggingface_provider import HuggingFaceProvider
+from services.providers.stable_diffusion_provider import StableDiffusionProvider
+from services.providers.ibm_provider import IBMProvider
+
+logger = logging.getLogger("brandcraft.router")
 
 class AIRouter:
-    @staticmethod
-    async def route_request(task: str, payload: str) -> Any:
-        # Decides provider based on task complexity/cost
-        if task == "branding_names":
-            return await AIRouter._call_gemini(payload)
-        elif task == "sentiment":
-            return await AIRouter._call_huggingface(payload)
-        elif task == "logo":
-            return await AIRouter._call_stable_diffusion(payload)
-        else:
-            return await AIRouter._call_gemini(payload)
+    # Simple in-memory cache
+    _cache: Dict[str, Any] = {}
+    
+    # Initialize providers
+    gemini = GeminiProvider()
+    hf = HuggingFaceProvider()
+    sd = StableDiffusionProvider()
+    ibm = IBMProvider()
 
-    @staticmethod
-    async def _call_gemini(prompt: str):
-        # Implementation would use google-generativeai
-        return {"provider": "gemini", "response": f"Generated via Gemini: {prompt[:20]}..."}
+    @classmethod
+    async def route_request(cls, task: str, payload: str) -> Any:
+        # Cache Key Generation
+        cache_key = f"{task}:{hash(payload)}"
+        if cache_key in cls._cache:
+            logger.info(f"Cache Hit for {task}")
+            return cls._cache[cache_key]
 
-    @staticmethod
-    async def _call_huggingface(text: str):
-        # Mocking HF API call
-        return {"sentiment": "positive", "score": 0.98, "provider": "hf_bert_v2"}
+        logger.info(f"Routing task: {task}")
+        try:
+            result = None
+            if task in ["content", "name", "branding_names"]:
+                res_text = await cls.gemini.generate_text(payload)
+                result = {"provider": "gemini", "response": res_text}
+                
+            elif task == "sentiment":
+                analysis = await cls.hf.analyze_sentiment(payload)
+                result = {**analysis, "provider": "huggingface"}
+                
+            elif task == "logo":
+                img_path = await cls.sd.generate_logo(payload)
+                result = {"image_url": img_path, "provider": "stability_ai"}
+                
+            elif task == "assistant":
+                res_text = await cls.ibm.branding_advisor(payload)
+                result = {"provider": "ibm_watsonx", "response": res_text}
+                
+            else:
+                res_text = await cls.gemini.generate_text(payload)
+                result = {"provider": "gemini_fallback", "response": res_text}
 
-    @staticmethod
-    async def _call_stable_diffusion(prompt: str):
-        return {"image_url": "https://placehold.co/600x400/0f172a/6366f1?text=Logo+Render", "provider": "sdxl_turbo"}
+            # Update Cache (Skip for logos to avoid stale paths)
+            if task != "logo":
+                cls._cache[cache_key] = result
+                
+            return result
+
+        except Exception as e:
+            logger.error(f"Routing Error for {task}: {str(e)}")
+            # Fallback or Graceful failure
+            return {
+                "error": True, 
+                "message": f"Service temporarily unavailable: {task}", 
+                "details": str(e)
+            }

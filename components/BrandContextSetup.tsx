@@ -1,8 +1,9 @@
 
 import React, { useState, useContext } from 'react';
-import { Settings, Save, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Settings, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { BrandContextData } from '../App';
 import { BrandContext } from '../types';
+import { BrandCraftAPI } from '../services/api_client';
 
 const BrandContextSetup: React.FC = () => {
   const { context, setContext } = useContext(BrandContextData);
@@ -14,13 +15,25 @@ const BrandContextSetup: React.FC = () => {
     keywords: []
   });
   const [keywordInput, setKeywordInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const [savedStatus, setSavedStatus] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setContext(formData);
-    setSavedStatus(true);
-    setTimeout(() => setSavedStatus(false), 3000);
+    setLoading(true);
+    try {
+      // Sync with Backend
+      const result = await BrandCraftAPI.createContext(formData);
+      const updatedContext = { ...formData, id: result.context_id };
+      
+      setContext(updatedContext);
+      setSavedStatus(true);
+      setTimeout(() => setSavedStatus(false), 3000);
+    } catch (error) {
+      console.error("Context sync failed", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addKeyword = () => {
@@ -126,10 +139,11 @@ const BrandContextSetup: React.FC = () => {
 
         <button 
           type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
+          disabled={loading}
+          className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
         >
-          {savedStatus ? <CheckCircle2 size={20} /> : <Save size={20} />}
-          {savedStatus ? 'Configuration Synchronized' : 'Persist Brand Context'}
+          {loading ? <Loader2 className="animate-spin" /> : savedStatus ? <CheckCircle2 size={20} /> : <Save size={20} />}
+          {loading ? 'Synchronizing with Neural Core...' : savedStatus ? 'Configuration Synchronized' : 'Persist Brand Context'}
         </button>
 
         {!context && (

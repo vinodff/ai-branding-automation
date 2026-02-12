@@ -1,9 +1,13 @@
+
 import logging
 import time
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from routes import context, branding
-from core.exceptions import setup_exception_handlers
+from core.exceptions import setup_exception_handlers, BrandCraftException
+from core.config import settings
 
 # Configure logging
 logging.basicConfig(
@@ -20,14 +24,29 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
-# CORS configuration for frontend integration
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restricted in real production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static files for generated assets
+if not os.path.exists(settings.STATIC_DIR):
+    os.makedirs(settings.STATIC_DIR)
+app.mount("/static", StaticFiles(directory=settings.STATIC_DIR), name="static")
+
+@app.on_event("startup")
+async def validate_environment():
+    required_keys = ["API_KEY", "HF_API_KEY", "SD_API_KEY", "IBM_API_KEY", "IBM_PROJECT_ID"]
+    missing = [key for key in required_keys if not getattr(settings, key, None)]
+    if missing:
+        error_msg = f"Startup Failed: Missing required API keys in environment: {', '.join(missing)}"
+        logger.error(error_msg)
+        raise RuntimeError(error_msg)
+    logger.info("Environment validation successful. All AI providers configured.")
 
 # Custom Logging Middleware
 @app.middleware("http")
