@@ -22,6 +22,7 @@ export enum AppRoute {
   CONTEXT = 'context',
   NAME_GEN = 'name-gen',
   LOGO_GEN = 'logo-gen',
+  PROMOTION = 'promotion',
   CONTENT_GEN = 'content-gen',
   SENTIMENT = 'sentiment',
   ASSISTANT = 'assistant',

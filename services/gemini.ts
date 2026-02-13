@@ -3,7 +3,6 @@ import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { GeneratedBrandName, SentimentResult, BrandContext, RoadmapStep } from "../types";
 import { BrandCraftAPI } from "./api_client";
 
-// Fix: Add decodeBase64 helper for raw PCM audio processing
 const decodeBase64 = (base64: string) => {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -14,7 +13,6 @@ const decodeBase64 = (base64: string) => {
   return bytes;
 };
 
-// Fix: Add decodeAudioData helper to transform raw PCM bytes into an AudioBuffer
 const decodeAudioData = async (
   data: Uint8Array,
   ctx: AudioContext,
@@ -41,12 +39,10 @@ export class GeminiService {
 
   async generateBrandNames(context: BrandContext | null): Promise<GeneratedBrandName[]> {
     try {
-      // Priority: Backend API for Credit Tracking
       const res = await BrandCraftAPI.generateNames({ context_id: context?.id });
       if (res.text) return JSON.parse(res.text);
       throw new Error("Direct route required");
     } catch (e) {
-      // Demo Fallback
       return [
         { name: "Aethera", meaning: "Divine atmosphere blend." },
         { name: "Vantix", meaning: "Cutting-edge vantage." }
@@ -61,6 +57,37 @@ export class GeminiService {
     } catch (e) {
       return "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&q=80&w=1024";
     }
+  }
+
+  async generatePromotionPoster(style: 'luxury' | 'cinematic' | 'bold', context: BrandContext | null): Promise<string> {
+    const ai = this.getAI();
+    const brandName = context?.industry?.toUpperCase() || "BRANDCRAFT";
+    const industry = context?.industry || "Premium Lifestyle";
+    
+    let basePrompt = "";
+    
+    if (style === 'luxury') {
+      basePrompt = `Design a luxury ${industry} advertisement poster for "${brandName}". Model standing in spotlight with soft rim lighting, dark gradient background, glossy shadows. Add premium typography with thin modern serif font saying "${brandName} – Premium Collection". Include small luxury icons like diamond symbol, verified badge icon, and signature seal emblem. Minimal elegant layout, luxury brand campaign style, ultra realistic.`;
+    } else if (style === 'cinematic') {
+      basePrompt = `Create a cinematic ${industry} fashion poster for "${brandName}". Model in stylish outfit with wind blowing fabric, dramatic lighting, luxury color grading. Add glowing logo text "${brandName}" centered. Include branding elements: circular logo seal, signature monogram symbol, and premium authenticity stamp. Text line: "Signature Series". High-end fashion campaign aesthetic, bold composition, realistic texture detail.`;
+    } else {
+      basePrompt = `Design a bold luxury launch poster for "${brandName}". Dynamic pose model, spotlight beam lighting, dark background with gold dust particles. Add large premium typography "${brandName}". Add headline "ELITE DROP". Include luxury symbols like crest icon, crown emblem, and minimal badge icon near logo. ${industry} billboard quality, dramatic, powerful branding style.`;
+    }
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts: [{ text: basePrompt }] },
+      config: {
+        imageConfig: { aspectRatio: "9:16" }
+      }
+    });
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+    throw new Error("No image generated");
   }
 
   async analyzeSentiment(text: string): Promise<SentimentResult> {
@@ -81,7 +108,6 @@ export class GeminiService {
     }
   }
 
-  // Fix: Updated researchIndustry to use Gemini 3 with Google Search grounding for real-time market data
   async researchIndustry(context: BrandContext | null) {
     try {
       const ai = this.getAI();
@@ -115,7 +141,6 @@ export class GeminiService {
     }
   }
 
-  // Fix: Added generateContent to satisfy ContentGenerator component for text synthesis
   async generateContent(type: 'tagline' | 'mission' | 'social', context: BrandContext | null): Promise<string> {
     const ai = this.getAI();
     const response = await ai.models.generateContent({
@@ -128,7 +153,6 @@ export class GeminiService {
     return response.text || "Synthesis error: No content generated.";
   }
 
-  // Fix: Added chat to satisfy BrandingAssistant component for interactive strategy
   async chat(history: any[], input: string, context: BrandContext | null): Promise<string> {
     const ai = this.getAI();
     const chat = ai.chats.create({
@@ -142,9 +166,7 @@ export class GeminiService {
     return result.text || "Neural connection lost: Response aborted.";
   }
 
-  // Fix: Added generateVideo to satisfy NeuralMotion component using Veo models with API key management
   async generateVideo(prompt: string, context: BrandContext | null): Promise<string> {
-    // Check for API key selection mandatory for Veo models
     if (typeof (window as any).aistudio !== 'undefined') {
       const hasKey = await (window as any).aistudio.hasSelectedApiKey();
       if (!hasKey) {
@@ -174,7 +196,6 @@ export class GeminiService {
     return URL.createObjectURL(blob);
   }
 
-  // Fix: Added generateAudio to satisfy VocalIdentity component using raw PCM TTS synthesis
   async generateAudio(text: string, voice: string): Promise<AudioBuffer> {
     const ai = this.getAI();
     const response = await ai.models.generateContent({

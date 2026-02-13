@@ -4,13 +4,14 @@ import { HashRouter, Routes, Route, Navigate, Link, useLocation } from 'react-ro
 import { 
   LayoutDashboard, Tag, Palette, FileText, BarChart3, MessageSquare, 
   Sparkles, Menu, Settings as SettingsIcon, Search, CalendarDays, 
-  Clapperboard, Mic2, X, Zap, Key, ExternalLink, LogOut
+  Clapperboard, Mic2, X, Zap, Key, ExternalLink, LogOut, Megaphone
 } from 'lucide-react';
 
 import Dashboard from './components/Dashboard';
 import BrandContextSetup from './components/BrandContextSetup';
 import BrandNameGenerator from './components/BrandNameGenerator';
 import LogoGenerator from './components/LogoGenerator';
+import PromotionForge from './components/PromotionForge';
 import ContentGenerator from './components/ContentGenerator';
 import SentimentAnalyzer from './components/SentimentAnalyzer';
 import BrandingAssistant from './components/BrandingAssistant';
@@ -54,6 +55,7 @@ const Sidebar = ({ isOpen, toggle }: { isOpen: boolean; toggle: () => void }) =>
       items: [
         { id: AppRoute.NAME_GEN, label: 'Identity', icon: <Tag size={18} />, path: '/names' },
         { id: AppRoute.LOGO_GEN, label: 'Visual Forge', icon: <Palette size={18} />, path: '/logos' },
+        { id: AppRoute.PROMOTION, label: 'Promotion Forge', icon: <Megaphone size={18} />, path: '/promotion' },
         { id: AppRoute.CONTENT_GEN, label: 'Content Lab', icon: <FileText size={18} />, path: '/content' },
       ]
     },
@@ -204,6 +206,7 @@ const App: React.FC = () => {
                 <Route path="/research" element={<BrandResearch />} />
                 <Route path="/names" element={<BrandNameGenerator />} />
                 <Route path="/logos" element={<LogoGenerator />} />
+                <Route path="/promotion" element={<PromotionForge />} />
                 <Route path="/content" element={<ContentGenerator />} />
                 <Route path="/roadmap" element={<MarketingRoadmap />} />
                 <Route path="/video" element={<NeuralMotion />} />
