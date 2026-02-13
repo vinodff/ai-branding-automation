@@ -4,29 +4,132 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BrandCraft - AI Branding Automation</title>
+    <title>BrandCraft Ultra - Neural Identity Forge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #0f172a;
-        color: #f8fafc;
+      :root {
+        --glow-indigo: rgba(99, 102, 241, 0.5);
       }
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #020617;
+        color: #f8fafc;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+      .font-brand {
+        font-family: 'Orbitron', sans-serif;
+      }
+      /* Neural Mesh Background */
+      .neural-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: 
+          radial-gradient(circle at 0% 0%, #0f172a 0%, transparent 50%),
+          radial-gradient(circle at 100% 0%, #1e1b4b 0%, transparent 50%),
+          radial-gradient(circle at 50% 100%, #020617 0%, transparent 50%);
+        opacity: 0.8;
+      }
+
+      /* Scanning Line Effect */
+      .neural-bg::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%);
+        background-size: 100% 400%;
+        animation: scanline 10s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes scanline {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+      }
+
+      .glass-card {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .glass-card:hover {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.1);
+      }
+
+      .glow-border:hover {
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+      }
+
+      @keyframes float {
+        0% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(5px) rotate(-1deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+      }
+
+      .animate-float {
+        animation: float 8s ease-in-out infinite;
+      }
+
+      @keyframes fade-slide-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .page-transition {
+        animation: fade-slide-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+
       ::-webkit-scrollbar {
         width: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #1e293b;
+        background: #020617;
       }
       ::-webkit-scrollbar-thumb {
-        background: #334155;
-        border-radius: 4px;
+        background: #1e293b;
+        border-radius: 10px;
+        border: 2px solid #020617;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #475569;
+        background: #334155;
+      }
+
+      /* Neural Button Pulsing */
+      .btn-glow {
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-glow::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        transform: scale(0);
+        transition: transform 0.6s ease-out;
+        pointer-events: none;
+      }
+      .btn-glow:hover::after {
+        transform: scale(1);
       }
     </style>
   <script type="importmap">
@@ -44,6 +147,7 @@
 </script>
 </head>
   <body>
+    <div class="neural-bg"></div>
     <div id="root"></div>
   </body>
 </html>

@@ -1,23 +1,32 @@
 
 import React, { useState, useContext } from 'react';
-import { Palette, Loader2, Download, Image as ImageIcon, Sparkles, AlertCircle } from 'lucide-react';
+import { Palette, Loader2, Download, Image as ImageIcon, Sparkles, AlertCircle, Zap, Eye } from 'lucide-react';
 import { GeminiService } from '../services/gemini';
 import { BrandContextData } from '../App';
-import { Link } from 'react-router-dom';
 
 const LogoGenerator: React.FC = () => {
   const { context } = useContext(BrandContextData);
   const [prompt, setPrompt] = useState('');
+  const [style, setStyle] = useState('minimalist');
   const [loading, setLoading] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logos, setLogos] = useState<string[]>([]);
+  const [activeLogo, setActiveLogo] = useState<string | null>(null);
+
+  const styles = [
+    { id: 'minimalist', label: 'Tech Minimal', desc: 'Clean, Modern' },
+    { id: 'futuristic', label: 'Cyber Pulse', desc: 'Neon, Glass' },
+    { id: 'heritage', label: 'Legacy Core', desc: 'Premium, Stable' },
+  ];
 
   const handleGenerate = async () => {
     if (!prompt) return;
     setLoading(true);
+    setLogos([]);
     try {
       const gemini = new GeminiService();
-      const url = await gemini.generateLogo(prompt, context);
-      setLogoUrl(url);
+      const url = await gemini.generateLogo(`${style} style: ${prompt}`, context);
+      setLogos([url]);
+      setActiveLogo(url);
     } catch (error) {
       console.error(error);
     } finally {
@@ -25,79 +34,65 @@ const LogoGenerator: React.FC = () => {
     }
   };
 
-  const handleDownload = () => {
-    if (!logoUrl) return;
-    const link = document.createElement('a');
-    link.href = logoUrl;
-    link.download = `brandcraft-logo-${Date.now()}.png`;
-    link.click();
-  };
-
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-10 text-center">
-        <h2 className="text-3xl font-bold text-white mb-4">Logo Visualizer</h2>
-        <p className="text-slate-400 max-w-xl mx-auto">Render visual assets that adhere to your brand's core personality and industry tone.</p>
+    <div className="max-w-7xl mx-auto pb-20">
+      <div className="mb-16 text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full mb-6">
+          <Zap size={14} className="text-indigo-400" />
+          <span className="text-[10px] font-brand font-bold text-indigo-300 uppercase tracking-widest">Visual Forge Alpha</span>
+        </div>
+        <h2 className="text-5xl font-brand font-black text-white mb-6 tracking-tighter">Visual Identity <span className="text-indigo-500">Forge.</span></h2>
+        <p className="text-slate-400 text-xl max-w-2xl mx-auto leading-relaxed">Synthesize high-fidelity brand marks using the latest neural rendering cores.</p>
       </div>
 
-      {!context ? (
-        <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-center">
-          <AlertCircle className="mx-auto text-amber-500 mb-4" size={48} />
-          <h3 className="text-xl font-bold text-white mb-2">Context Missing</h3>
-          <p className="text-slate-400 mb-6">Setup your Brand DNA to guide the logo generation process.</p>
-          <Link to="/context" className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold transition-all inline-block">
-            Configure Context
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl">
-            <div className="flex items-center gap-3 mb-6 p-3 bg-indigo-600/10 rounded-xl border border-indigo-500/20">
-              <Sparkles className="text-indigo-400" size={16} />
-              <p className="text-xs text-indigo-200">Using {context.tone} aesthetic guidelines</p>
-            </div>
-
-            <label className="block text-sm font-medium text-slate-400 mb-4">Design Concept</label>
-            <textarea 
-              rows={4}
-              placeholder="Describe icons or specific imagery you want to include..."
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white resize-none mb-6"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-            
-            <button 
-              onClick={handleGenerate}
-              disabled={loading || !prompt}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
-            >
-              {loading ? <Loader2 className="animate-spin" /> : <Sparkles size={20} />}
-              {loading ? 'Synthesizing Vision...' : 'Generate Branded Asset'}
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center justify-center bg-slate-900 border border-slate-800 border-dashed rounded-3xl min-h-[400px] p-8 relative overflow-hidden">
-            {logoUrl ? (
-              <div className="space-y-6 w-full flex flex-col items-center animate-in zoom-in duration-300">
-                <img src={logoUrl} alt="Generated Logo" className="w-full aspect-square rounded-2xl shadow-2xl border border-slate-700" />
-                <button 
-                  onClick={handleDownload}
-                  className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl transition-colors font-medium border border-slate-700"
-                >
-                  <Download size={18} /> Export High-Res
-                </button>
-              </div>
-            ) : (
-              <div className="text-center">
-                <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-600">
-                  <Palette size={40} />
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+        <div className="xl:col-span-5 space-y-10">
+          <div className="glass-card p-10 rounded-[2.5rem] border border-white/5">
+            <div className="space-y-8">
+              <div>
+                <label className="block text-[10px] font-brand font-black text-slate-500 uppercase tracking-widest mb-4">Aesthetic Style</label>
+                <div className="grid grid-cols-3 gap-4">
+                  {styles.map(s => (
+                    <button key={s.id} onClick={() => setStyle(s.id)} className={`p-4 rounded-2xl border text-left transition-all ${style === s.id ? 'bg-indigo-600 border-indigo-400 shadow-lg' : 'bg-white/5 border-white/5'}`}>
+                      <p className={`text-xs font-brand font-black uppercase mb-1 ${style === s.id ? 'text-white' : 'text-slate-400'}`}>{s.label}</p>
+                    </button>
+                  ))}
                 </div>
-                <p className="text-slate-500 font-medium">Render preview will appear here</p>
               </div>
-            )}
+              <div>
+                <label className="block text-[10px] font-brand font-black text-slate-500 uppercase tracking-widest mb-4">Creative Directive</label>
+                <textarea rows={4} placeholder="A minimalist geometric mark merging with digital patterns..." className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white resize-none text-sm" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
+              </div>
+              <button onClick={handleGenerate} disabled={loading || !prompt} className="w-full bg-white text-slate-950 hover:bg-slate-100 disabled:opacity-50 font-brand font-black py-5 rounded-2xl transition-all shadow-2xl">
+                {loading ? <Loader2 className="animate-spin" /> : <Sparkles size={20} />}
+                {loading ? 'Executing...' : 'Execute Synthesis'}
+              </button>
+            </div>
           </div>
         </div>
-      )}
+
+        <div className="xl:col-span-7">
+          <div className="glass-card rounded-[3rem] p-4 min-h-[500px] flex flex-col">
+            <div className="flex-1 glass-card bg-slate-950/50 rounded-[2.5rem] border border-white/5 flex items-center justify-center relative overflow-hidden">
+              {loading ? (
+                <div className="flex flex-col items-center animate-pulse">
+                  <Palette size={64} className="text-indigo-400 mb-6" />
+                  <p className="text-xl font-brand font-black text-white">Synthesizing Visual Core...</p>
+                </div>
+              ) : activeLogo ? (
+                <div className="p-12 animate-in zoom-in duration-500">
+                   <img src={activeLogo} className="max-w-full rounded-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)]" alt="Synthesized Logo" />
+                </div>
+              ) : (
+                <div className="text-center opacity-20">
+                  <ImageIcon size={64} className="text-slate-400 mb-6 mx-auto" />
+                  <p className="text-xl font-brand font-black text-slate-400">Awaiting Neural Directive</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

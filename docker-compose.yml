@@ -1,0 +1,27 @@
+
+version: '3.8'
+
+services:
+  brandcraft:
+    build: .
+    container_name: brandcraft_prod
+    restart: always
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./static:/app/static
+      - ./logs:/app/logs
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

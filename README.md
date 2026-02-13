@@ -1,20 +1,61 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
 
-# Run and deploy your AI Studio app
+# BrandCraft - Enterprise SaaS Platform
 
-This contains everything you need to run your app locally.
+High-performance, credit-based AI Branding platform built with FastAPI, SQLAlchemy, and React.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1pIh4kdWvsfJQLPTaXL5A7YQTOHzYMKLl
+## 🚀 Startup Instructions
 
-## Run Locally
+### 1. Prerequisites
+- Python 3.10+
+- Node.js 18+
+- SQLite (default) or PostgreSQL
 
-**Prerequisites:**  Node.js
+### 2. Backend Setup
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
+# Configure environment
+cp .env.example .env 
+# Ensure API_KEY and JWT_SECRET are set
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+# Initialize Database & Run Diagnostics
+python system_check.py
+
+# Start the Server
+python main.py
+```
+
+### 3. Frontend Setup
+```bash
+# The app is designed to run via index.html/index.tsx (ESM modules)
+# Simply serve the root directory using any static file server
+npx serve .
+```
+
+## 🏗 Project Architecture
+
+```text
+brandcraft/
+├── core/               # Security, Logging, Middleware
+├── database/           # Models, Connection, CRUD
+├── modules/            # SaaS Logic (Auth, Credits, Plans)
+├── routes/             # API Endpoints
+├── services/           # AI Routing & Metrics Engine
+├── static/             # Generated Assets
+├── main.py             # Entry Point
+└── system_check.py     # Diagnostic Script
+```
+
+## 💳 Usage Credits
+| Feature | Cost |
+| :--- | :--- |
+| Brand Name | 1 Credit |
+| Content Generation | 2 Credits |
+| Logo Synthesis | 5 Credits |
+| AI Assistant | 1 Credit |
+
+## 🛡 Security
+- Built-in **Prompt Injection** filters.
+- **JWT** Authentication with tier-based access.
+- **XSS** and Malicious Text filtering on all inputs.

@@ -1,6 +1,6 @@
 
 import React, { useState, useContext } from 'react';
-import { Settings, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Settings, Save, AlertCircle, CheckCircle2, Loader2, Zap } from 'lucide-react';
 import { BrandContextData } from '../App';
 import { BrandContext } from '../types';
 import { BrandCraftAPI } from '../services/api_client';
@@ -14,7 +14,6 @@ const BrandContextSetup: React.FC = () => {
     brand_personality: '',
     keywords: []
   });
-  const [keywordInput, setKeywordInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [savedStatus, setSavedStatus] = useState(false);
 
@@ -22,10 +21,8 @@ const BrandContextSetup: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Sync with Backend
       const result = await BrandCraftAPI.createContext(formData);
       const updatedContext = { ...formData, id: result.context_id };
-      
       setContext(updatedContext);
       setSavedStatus(true);
       setTimeout(() => setSavedStatus(false), 3000);
@@ -36,124 +33,84 @@ const BrandContextSetup: React.FC = () => {
     }
   };
 
-  const addKeyword = () => {
-    if (keywordInput.trim() && !formData.keywords.includes(keywordInput.trim())) {
-      setFormData({ ...formData, keywords: [...formData.keywords, keywordInput.trim()] });
-      setKeywordInput('');
-    }
-  };
-
-  const removeKeyword = (kw: string) => {
-    setFormData({ ...formData, keywords: formData.keywords.filter(k => k !== kw) });
-  };
-
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-10">
-        <h2 className="text-3xl font-bold text-white mb-2">Brand DNA Configuration</h2>
-        <p className="text-slate-400">Establish the core identity of your brand. These parameters are injected into every AI generation to ensure perfect alignment.</p>
+    <div className="max-w-4xl mx-auto pb-20">
+      <div className="mb-12 text-center animate-in fade-in duration-700">
+        <h2 className="text-4xl font-brand font-black text-white mb-4 tracking-tighter">Identity Core</h2>
+        <p className="text-slate-400 text-lg max-w-xl mx-auto">Calibrate the neural engine with your brand's unique genetic markers.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-slate-900 border border-slate-800 p-8 rounded-3xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Industry</label>
+      <form onSubmit={handleSubmit} className="glass-card p-10 lg:p-16 rounded-[3rem] space-y-10 relative overflow-hidden group shadow-2xl">
+        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 group-hover:rotate-12 transition-all duration-1000"><Zap size={100} /></div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="space-y-2 group/field">
+            <label className="text-[10px] font-brand font-black text-slate-500 group-focus-within/field:text-indigo-400 uppercase tracking-widest px-1 transition-colors">Market Industry</label>
             <input 
               type="text" 
-              required
-              placeholder="e.g. Sustainable Fintech"
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
-              value={formData.industry}
-              onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+              required 
+              placeholder="e.g. Neo-Fintech" 
+              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 text-white transition-all hover:bg-slate-950/70" 
+              value={formData.industry} 
+              onChange={(e) => setFormData({ ...formData, industry: e.target.value })} 
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Target Audience</label>
+          <div className="space-y-2 group/field">
+            <label className="text-[10px] font-brand font-black text-slate-500 group-focus-within/field:text-indigo-400 uppercase tracking-widest px-1 transition-colors">Target Archetype</label>
             <input 
               type="text" 
-              required
-              placeholder="e.g. Gen Z Investors"
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
-              value={formData.target_audience}
-              onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Brand Tone</label>
-            <select 
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
-              value={formData.tone}
-              onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
-            >
-              <option value="professional">Professional & Secure</option>
-              <option value="disruptive">Disruptive & Bold</option>
-              <option value="warm">Warm & Empathetic</option>
-              <option value="luxury">Luxury & Exclusive</option>
-              <option value="minimalist">Minimalist & Clean</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Primary Personality</label>
-            <input 
-              type="text" 
-              required
-              placeholder="e.g. Innovative, Reliable, Playful"
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
-              value={formData.brand_personality}
-              onChange={(e) => setFormData({ ...formData, brand_personality: e.target.value })}
+              required 
+              placeholder="e.g. Early Adopters" 
+              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 text-white transition-all hover:bg-slate-950/70" 
+              value={formData.target_audience} 
+              onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })} 
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-400 mb-2">Core Keywords (max 5)</label>
-          <div className="flex gap-2 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="space-y-2 group/field">
+            <label className="text-[10px] font-brand font-black text-slate-500 group-focus-within/field:text-indigo-400 uppercase tracking-widest px-1 transition-colors">Acoustic Tone</label>
+            <div className="relative">
+              <select 
+                className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 text-white appearance-none cursor-pointer transition-all hover:bg-slate-950/70" 
+                value={formData.tone} 
+                onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
+              >
+                <option value="professional">Professional Alpha</option>
+                <option value="disruptive">Disruptive Core</option>
+                <option value="luxury">Luxury Elite</option>
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-focus-within/field:opacity-100 transition-opacity">
+                <div className="flex gap-0.5">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="w-1 h-3 bg-indigo-500 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2 group/field">
+            <label className="text-[10px] font-brand font-black text-slate-500 group-focus-within/field:text-indigo-400 uppercase tracking-widest px-1 transition-colors">Brand Personality</label>
             <input 
               type="text" 
-              placeholder="Add keyword..."
-              className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white"
-              value={keywordInput}
-              onChange={(e) => setKeywordInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addKeyword())}
+              required 
+              placeholder="Innovative, Reliable" 
+              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/30 text-white transition-all hover:bg-slate-950/70" 
+              value={formData.brand_personality} 
+              onChange={(e) => setFormData({ ...formData, brand_personality: e.target.value })} 
             />
-            <button 
-              type="button" 
-              onClick={addKeyword}
-              className="bg-slate-800 hover:bg-slate-700 text-white px-6 rounded-xl border border-slate-700 font-bold"
-            >
-              Add
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.keywords.map(kw => (
-              <span key={kw} className="bg-indigo-600/20 text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-600/30 flex items-center gap-2">
-                {kw}
-                <button type="button" onClick={() => removeKeyword(kw)} className="hover:text-white">×</button>
-              </span>
-            ))}
           </div>
         </div>
 
         <button 
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
+          type="submit" 
+          disabled={loading} 
+          className="w-full bg-white text-slate-950 hover:bg-indigo-50 disabled:opacity-50 font-brand font-black py-5 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-[0.98] btn-glow"
         >
-          {loading ? <Loader2 className="animate-spin" /> : savedStatus ? <CheckCircle2 size={20} /> : <Save size={20} />}
-          {loading ? 'Synchronizing with Neural Core...' : savedStatus ? 'Configuration Synchronized' : 'Persist Brand Context'}
+          {loading ? <Loader2 className="animate-spin" /> : savedStatus ? <CheckCircle2 size={24} className="text-emerald-600 animate-bounce" /> : <Save size={24} />}
+          {loading ? 'Synthesizing...' : savedStatus ? 'Identity Stored' : 'Persist Brand DNA'}
         </button>
-
-        {!context && (
-          <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
-            <AlertCircle className="text-amber-500 shrink-0 mt-0.5" size={18} />
-            <p className="text-xs text-amber-200 leading-relaxed">
-              <strong>Context Missing:</strong> Define your brand DNA now to enable context-aware AI generations. Without context, models will default to generic outputs.
-            </p>
-          </div>
-        )}
       </form>
     </div>
   );

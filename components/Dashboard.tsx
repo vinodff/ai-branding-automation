@@ -1,122 +1,117 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, TrendingUp, Zap, Target, ArrowRight, Search, CalendarDays, MessageSquare } from 'lucide-react';
+import { 
+  Sparkles, TrendingUp, Zap, Target, ArrowRight, 
+  Search, CalendarDays, MessageSquare, ShieldCheck, Cpu,
+  Palette, Clapperboard, Mic2
+} from 'lucide-react';
 
-const StatCard = ({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) => (
-  <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-colors group">
-    <div className="flex justify-between items-start mb-4">
-      <div className={`p-3 rounded-xl ${color} bg-opacity-10`}>
-        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { className: color.replace('bg-', 'text-') }) : icon}
+const StatCard = ({ label, value, icon, color, delay }: { label: string; value: string; icon: React.ReactNode; color: string, delay: string }) => (
+  <div className={`glass-card p-8 rounded-[2rem] hover:border-white/20 transition-all group animate-in slide-in-from-bottom-4 duration-500 ${delay} hover:-translate-y-2`}>
+    <div className="flex justify-between items-start mb-6">
+      <div className={`p-4 rounded-2xl ${color} bg-opacity-10 text-white shadow-inner group-hover:scale-110 transition-transform duration-500`}>
+        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 24 }) : icon}
       </div>
-      <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">Active</span>
+      <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+        <span className="text-[10px] font-brand font-bold text-slate-400 uppercase tracking-tighter">Live</span>
+      </div>
     </div>
-    <h3 className="text-slate-400 text-sm font-medium mb-1">{label}</h3>
-    <p className="text-2xl font-bold text-white group-hover:text-indigo-400 transition-colors">{value}</p>
+    <h3 className="text-slate-500 text-xs font-brand font-bold uppercase tracking-widest mb-2 group-hover:text-slate-400 transition-colors">{label}</h3>
+    <p className="text-3xl font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight">{value}</p>
   </div>
 );
 
-const FeatureCard = ({ title, desc, path, icon, isNew }: { title: string; desc: string; path: string; icon: React.ReactNode, isNew?: boolean }) => (
-  <Link to={path} className="flex flex-col p-6 bg-slate-900 border border-slate-800 rounded-3xl hover:bg-slate-800/50 transition-all hover:-translate-y-1 relative group overflow-hidden">
+const ModuleCard = ({ title, desc, path, icon, isNew }: { title: string; desc: string; path: string; icon: React.ReactNode, isNew?: boolean }) => (
+  <Link to={path} className="flex flex-col p-8 glass-card rounded-[2.5rem] hover:bg-white/5 transition-all hover:-translate-y-2 relative group overflow-hidden border border-white/5 active:scale-95">
     {isNew && (
-      <div className="absolute top-0 right-0 px-3 py-1 bg-indigo-600 text-[10px] font-black uppercase text-white rounded-bl-xl tracking-widest">
-        New
+      <div className="absolute top-0 right-0 px-4 py-1.5 bg-indigo-600 text-[10px] font-brand font-black uppercase text-white rounded-bl-2xl tracking-[0.2em] shadow-lg group-hover:bg-indigo-500 transition-colors">
+        Alpha
       </div>
     )}
-    <div className="text-indigo-500 mb-4 group-hover:scale-110 transition-transform">{icon}</div>
-    <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-    <p className="text-slate-400 text-sm mb-6 flex-1 line-clamp-3">{desc}</p>
-    <div className="flex items-center text-indigo-400 text-sm font-semibold">
-      Explore Module <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+    <div className="w-14 h-14 bg-indigo-600/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] transition-all duration-500">
+      {icon}
     </div>
+    <h3 className="text-xl font-black text-white mb-3 tracking-tight group-hover:text-indigo-300 transition-colors">{title}</h3>
+    <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-1 opacity-80 group-hover:opacity-100 transition-opacity">{desc}</p>
+    <div className="flex items-center text-indigo-400 text-sm font-bold uppercase tracking-widest">
+      Initialize Lab <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+    </div>
+    
+    {/* Subtle sweep effect on hover */}
+    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-indigo-500/0 to-indigo-500/0 group-hover:via-indigo-500/5 transition-all duration-700 pointer-events-none" />
   </Link>
 );
 
 const Dashboard: React.FC = () => {
   return (
-    <div className="max-w-6xl mx-auto space-y-12">
+    <div className="max-w-7xl mx-auto space-y-20 pb-20">
       <section>
-        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h2 className="text-4xl font-black text-white mb-2 tracking-tight">Brand Orchestrator</h2>
-            <p className="text-slate-400 text-lg">Centralize your brand strategy through advanced neural synthesis.</p>
+        <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="animate-in fade-in slide-in-from-left-4 duration-700">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full mb-6 hover:bg-indigo-500/15 transition-colors">
+              <Cpu size={14} className="text-indigo-400" />
+              <span className="text-[10px] font-brand font-bold text-indigo-300 uppercase tracking-widest">Neural Orchestrator V4.5</span>
+            </div>
+            <h2 className="text-5xl font-black text-white mb-4 tracking-tighter leading-none">Your Brand, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-rose-400">Synthesized.</span></h2>
+            <p className="text-slate-400 text-xl font-medium max-w-2xl leading-relaxed">The command center for your brand's evolution. Monitor equity, synthesize assets, and command your narrative.</p>
           </div>
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-500 border border-slate-800 px-4 py-2 rounded-full uppercase tracking-widest">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            V4.2.0 Stable
+          <div className="flex gap-4 animate-in fade-in duration-1000">
+             <div className="p-4 glass-card rounded-3xl flex flex-col items-center hover:scale-110 transition-transform">
+                <ShieldCheck className="text-emerald-500 mb-2" size={20} />
+                <span className="text-[10px] font-brand font-bold text-slate-500 uppercase">Trust Core</span>
+             </div>
+             <div className="p-4 glass-card rounded-3xl flex flex-col items-center hover:scale-110 transition-transform">
+                <Zap className="text-amber-500 mb-2" size={20} />
+                <span className="text-[10px] font-brand font-bold text-slate-500 uppercase">Neural Speed</span>
+             </div>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard label="Brand Equity" value="$2.4M" icon={<TrendingUp />} color="bg-indigo-500" />
-          <StatCard label="Synthesized Assets" value="284" icon={<Zap />} color="bg-rose-500" />
-          <StatCard label="Global Awareness" value="High" icon={<Target />} color="bg-emerald-500" />
-          <StatCard label="Market Alignment" value="98%" icon={<Sparkles />} color="bg-amber-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <StatCard label="Predicted Equity" value="$3.82M" icon={<TrendingUp />} color="bg-indigo-500" delay="delay-0" />
+          <StatCard label="Synthesis Count" value="1,492" icon={<Zap />} color="bg-rose-500" delay="delay-75" />
+          <StatCard label="Brand Resonance" value="Optimal" icon={<Target />} color="bg-emerald-500" delay="delay-150" />
+          <StatCard label="Market Fit" value="99.2%" icon={<Sparkles />} color="bg-fuchsia-500" delay="delay-300" />
         </div>
       </section>
 
       <section>
-        <div className="flex items-center gap-4 mb-8">
-          <h3 className="text-2xl font-bold text-white">Strategy & Research</h3>
-          <div className="h-px flex-1 bg-slate-800" />
+        <div className="flex items-center gap-6 mb-12">
+          <h3 className="text-2xl font-black text-white tracking-tight">Advanced Directives</h3>
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FeatureCard 
-            title="Industry Intelligence" 
-            desc="Real-time market scanning for trends, news, and competitor movements using search grounding."
-            path="/research"
-            icon={<Search size={32} />}
-            isNew
-          />
-          <FeatureCard 
-            title="Launch Roadmap" 
-            desc="Step-by-step 7-day execution guide to take your brand from concept to live deployment."
-            path="/roadmap"
-            icon={<CalendarDays size={32} />}
-            isNew
-          />
-        </div>
-      </section>
-
-      <section>
-        <div className="flex items-center gap-4 mb-8">
-          <h3 className="text-2xl font-bold text-white">Identity Modules</h3>
-          <div className="h-px flex-1 bg-slate-800" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FeatureCard 
-            title="Name Synthesis" 
-            desc="Context-aware brainstorming for high-potential, memorable brand names."
-            path="/names"
-            icon={<Target size={32} />}
-          />
-          <FeatureCard 
-            title="Visual Identity" 
-            desc="Advanced logo design generation and visual asset rendering."
-            path="/logos"
-            icon={<Zap size={32} />}
-          />
-          <FeatureCard 
-            title="Strategic Content" 
-            desc="Copywriting suite for taglines, mission statements, and social presence."
-            path="/content"
-            icon={<Sparkles size={32} />}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <ModuleCard title="Industry Pulse" desc="Market scanning engine that monitors live disruptions and competitor shifts." path="/research" icon={<Search size={28} />} />
+          <ModuleCard title="Identity Forge" desc="Synthesize context-aware brand names using next-gen linguistic models." path="/names" icon={<Target size={28} />} />
+          <ModuleCard title="Visual Foundry" desc="Render high-fidelity logos and visual assets that adhere to your core brand DNA." path="/logos" icon={<Palette size={28} />} isNew />
+          <ModuleCard title="Motion Studio" desc="Cinematic brand teasers rendered by the world's leading video engine." path="/video" icon={<Clapperboard size={28} />} isNew />
+          <ModuleCard title="Strategic Roadmap" desc="A detailed tactical execution plan to launch your brand into the stratosphere." path="/roadmap" icon={<CalendarDays size={28} />} />
+          <ModuleCard title="Vocal Identity" desc="Establish your brand's voice profile with high-quality neural speech synthesis." path="/voice" icon={<Mic2 size={28} />} isNew />
         </div>
       </section>
       
-      <section className="bg-indigo-600 rounded-3xl p-10 flex flex-col items-center text-center relative overflow-hidden group">
-        <div className="relative z-10 max-w-2xl">
-          <h3 className="text-3xl font-black text-white mb-4">Neural Branding Assistant</h3>
-          <p className="text-indigo-100 text-lg mb-8 opacity-90 leading-relaxed">
-            Need a second opinion on your positioning? Our strategic assistant is trained on top-tier marketing playbooks.
-          </p>
-          <Link to="/assistant" className="bg-white text-indigo-600 px-10 py-4 rounded-full font-black uppercase tracking-widest text-sm hover:bg-slate-100 transition-all shadow-xl hover:shadow-2xl">
-            Start Consultation
-          </Link>
+      <section className="relative rounded-[3rem] p-12 lg:p-20 overflow-hidden group shadow-2xl">
+        <div className="absolute inset-0 bg-indigo-600/10 group-hover:bg-indigo-600/15 transition-colors duration-700" />
+        <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-indigo-500/20 blur-[120px] rounded-full animate-pulse group-hover:bg-indigo-500/30 transition-colors duration-1000" />
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="animate-in slide-in-from-left-8 duration-700">
+            <h3 className="text-4xl font-black text-white mb-6 tracking-tighter">Strategic Assistant</h3>
+            <p className="text-slate-400 text-xl mb-10 leading-relaxed max-w-lg">
+              Collaborate with a neural branding expert trained on global marketing playbooks.
+            </p>
+            <Link to="/assistant" className="inline-flex items-center gap-4 bg-white text-slate-950 px-10 py-5 rounded-2xl font-brand font-black uppercase tracking-widest text-sm hover:bg-indigo-50 transition-all active:scale-95 shadow-2xl btn-glow">
+              Start Session <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+            </Link>
+          </div>
+          <div className="flex justify-center">
+            <div className="w-full max-w-md aspect-square glass-card rounded-[3rem] p-10 flex items-center justify-center animate-float relative group-hover:border-indigo-500/30 transition-all">
+               <MessageSquare size={160} className="text-indigo-500/40 relative z-10 group-hover:text-indigo-400 group-hover:scale-110 transition-all duration-700" />
+               <div className="absolute inset-0 bg-indigo-600/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-full" />
+            </div>
+          </div>
         </div>
-        {/* Fixed: MessageSquare added to imports on line 3 */}
-        <MessageSquare size={300} className="absolute -right-20 -bottom-20 text-indigo-500/30 rotate-12 group-hover:rotate-6 transition-transform duration-700 pointer-events-none" />
       </section>
     </div>
   );

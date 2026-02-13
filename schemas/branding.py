@@ -1,3 +1,4 @@
+
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -19,7 +20,8 @@ class ContentRequest(BaseModel):
 
 class LogoRequest(BaseModel):
     prompt: str
-    aspect_ratio: str = "1:1"
+    style: Optional[str] = "minimalist"
+    context_id: Optional[str] = None
 
 class SentimentRequest(BaseModel):
     text: str
@@ -27,3 +29,19 @@ class SentimentRequest(BaseModel):
 class AssistantRequest(BaseModel):
     message: str
     history: List[dict] = []
+    context_id: Optional[str] = None
+
+class VideoRequest(BaseModel):
+    prompt: str
+    context_id: Optional[str] = None
+
+class VoiceRequest(BaseModel):
+    text: str
+    voice: Optional[str] = "Kore"
+    context_id: Optional[str] = None
+
+class ResearchRequest(BaseModel):
+    context_id: Optional[str] = None
+
+class RoadmapRequest(BaseModel):
+    context_id: Optional[str] = None

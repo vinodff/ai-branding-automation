@@ -1,65 +1,68 @@
 
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 import logging
+import asyncio
+import time
 from services.providers.gemini_provider import GeminiProvider
-from services.providers.huggingface_provider import HuggingFaceProvider
+from services.providers.openai_provider import OpenAIProvider
 from services.providers.stable_diffusion_provider import StableDiffusionProvider
-from services.providers.ibm_provider import IBMProvider
+from services.providers.huggingface_provider import HuggingFaceProvider
+from services.providers.base import AIProvider
 
 logger = logging.getLogger("brandcraft.router")
 
 class AIRouter:
-    # Simple in-memory cache
-    _cache: Dict[str, Any] = {}
+    _text_providers: List[AIProvider] = [
+        GeminiProvider(model_name='gemini-3-flash-preview'),
+        OpenAIProvider(model_name='gpt-4o-mini')
+    ]
     
-    # Initialize providers
-    gemini = GeminiProvider()
-    hf = HuggingFaceProvider()
-    sd = StableDiffusionProvider()
-    ibm = IBMProvider()
+    _sd_provider = StableDiffusionProvider()
+    _hf_provider = HuggingFaceProvider()
+
+    @staticmethod
+    def estimate_cost(provider: str, model: str, prompt_tokens: int, completion_tokens: int) -> float:
+        prices = {
+            "google": {"gemini-3-flash-preview": 0.0001, "gemini-2.5-flash-image": 0.02},
+            "openai": {"gpt-4o": 0.005, "gpt-4o-mini": 0.00015},
+            "stability": {"sdxl": 0.05}
+        }
+        rate = prices.get(provider, {}).get(model, 0.0002)
+        return ((prompt_tokens + completion_tokens) / 1000.0) * rate
 
     @classmethod
-    async def route_request(cls, task: str, payload: str) -> Any:
-        # Cache Key Generation
-        cache_key = f"{task}:{hash(payload)}"
-        if cache_key in cls._cache:
-            logger.info(f"Cache Hit for {task}")
-            return cls._cache[cache_key]
+    async def route_text(cls, task: str, payload: str) -> Dict[str, Any]:
+        for provider in cls._text_providers:
+            try:
+                result = await provider.generate_text(payload)
+                result["cost_estimate"] = cls.estimate_cost(
+                    result["provider"], result["model"],
+                    result["usage"]["prompt_tokens"], result["usage"]["completion_tokens"]
+                )
+                return result
+            except Exception as e:
+                logger.warning(f"Text Provider failed: {str(e)}")
+                continue
+        return {"error": True, "message": "No text providers available."}
 
-        logger.info(f"Routing task: {task}")
+    @classmethod
+    async def route_image(cls, prompt: str) -> Dict[str, Any]:
         try:
-            result = None
-            if task in ["content", "name", "branding_names"]:
-                res_text = await cls.gemini.generate_text(payload)
-                result = {"provider": "gemini", "response": res_text}
-                
-            elif task == "sentiment":
-                analysis = await cls.hf.analyze_sentiment(payload)
-                result = {**analysis, "provider": "huggingface"}
-                
-            elif task == "logo":
-                img_path = await cls.sd.generate_logo(payload)
-                result = {"image_url": img_path, "provider": "stability_ai"}
-                
-            elif task == "assistant":
-                res_text = await cls.ibm.branding_advisor(payload)
-                result = {"provider": "ibm_watsonx", "response": res_text}
-                
-            else:
-                res_text = await cls.gemini.generate_text(payload)
-                result = {"provider": "gemini_fallback", "response": res_text}
-
-            # Update Cache (Skip for logos to avoid stale paths)
-            if task != "logo":
-                cls._cache[cache_key] = result
-                
-            return result
-
-        except Exception as e:
-            logger.error(f"Routing Error for {task}: {str(e)}")
-            # Fallback or Graceful failure
+            # Prefer SD for high-end logos
+            url = await cls._sd_provider.generate_logo(prompt)
             return {
-                "error": True, 
-                "message": f"Service temporarily unavailable: {task}", 
-                "details": str(e)
+                "url": url,
+                "provider": "stability",
+                "model": "sdxl",
+                "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+                "cost_estimate": 0.05
             }
+        except Exception:
+            # Fallback to Gemini Image
+            provider = GeminiProvider(model_name='gemini-2.5-flash-image')
+            res = await provider.generate_text(f"Generate logo: {prompt}")
+            return res
+
+    @classmethod
+    async def route_sentiment(cls, text: str) -> Dict[str, Any]:
+        return await cls._hf_provider.analyze_sentiment(text)
